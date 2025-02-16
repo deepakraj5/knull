@@ -1,4 +1,4 @@
-package utils
+package dtos
 
 type ResponseDto struct {
 	ResponseCode int32

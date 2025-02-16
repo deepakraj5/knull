@@ -1,13 +1,21 @@
 package handlers
 
 import (
-	"knull/utils"
+	"knull/internal/dtos"
+	"knull/internal/utils"
+	"knull/necrosword"
 	"net/http"
 )
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
 
-	payload := utils.ResponseDto{
+	// user := entities.User{}
+
+	// db.DB().Create(&user)
+
+	necrosword.Execute()
+
+	payload := dtos.ResponseDto{
 		ResponseCode: 200,
 		Message:      "Signup successful",
 		Data:         "user data",

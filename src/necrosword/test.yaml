@@ -1,0 +1,12 @@
+id: 1
+name: backend
+environment:
+  - NODE_ENV: qa
+  - NODE_VERSION: 22
+stages:
+  - stage:
+      name: Build
+      cmd: npm i -g yarn
+  - stage:
+      name: Test
+      cmd: npm uninstall -g yarn

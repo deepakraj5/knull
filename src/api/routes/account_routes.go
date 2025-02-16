@@ -11,7 +11,7 @@ func AccountRoutes() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	r.Get("/signup", handlers.SignUp)
+	r.Post("/signup", handlers.SignUp)
 
 	return r
 }
