@@ -7,11 +7,12 @@ import (
 	"strings"
 )
 
-func Shell(command string) {
+func Shell(command string, dir string) {
 
 	executableCommand := strings.Fields(command)
 
 	cmd := exec.Command(executableCommand[0], executableCommand[1:]...)
+	cmd.Dir = dir
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

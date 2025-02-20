@@ -9,5 +9,13 @@ func BaseRouter() *chi.Mux {
 		r.Mount("/", AccountRoutes())
 	})
 
+	r.Route("/pipeline", func(r chi.Router) {
+		r.Mount("/", PipelineRoutes())
+	})
+
+	r.Route("/webhook", func(r chi.Router) {
+		r.Mount("/", WebhookRoutes())
+	})
+
 	return r
 }

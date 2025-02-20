@@ -3,7 +3,6 @@ package handlers
 import (
 	"knull/internal/dtos"
 	"knull/internal/utils"
-	"knull/necrosword"
 	"net/http"
 )
 
@@ -13,7 +12,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	// db.DB().Create(&user)
 
-	necrosword.Execute()
+	// necrosword.Execute()
 
 	payload := dtos.ResponseDto{
 		ResponseCode: 200,

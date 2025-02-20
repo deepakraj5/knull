@@ -8,10 +8,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Execute() {
+func Execute(jobFilePath string, dir string) {
 	log.Println("Running job with necrosword")
 
-	jobFile, err := os.ReadFile("/Users/deepakraj/Documents/Deepak/Projects/knull/src/necrosword/test.yaml")
+	jobFile, err := os.ReadFile(jobFilePath)
 	if err != nil {
 		log.Fatalf("Failed to read YAML file: %v", err)
 	}
@@ -35,6 +35,6 @@ func Execute() {
 	for _, stages := range job.Stages {
 		log.Printf("Executing stage: %s, with command: %s", stages.Stage.Name, stages.Stage.Cmd)
 
-		Shell(stages.Stage.Cmd)
+		Shell(stages.Stage.Cmd, dir)
 	}
 }
