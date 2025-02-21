@@ -34,3 +34,5 @@ debug/
 *.pb.gw.go
 
 _cgo_*
+
+.env

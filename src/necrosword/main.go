@@ -13,13 +13,15 @@ func Execute(jobFilePath string, dir string) {
 
 	jobFile, err := os.ReadFile(jobFilePath)
 	if err != nil {
-		log.Fatalf("Failed to read YAML file: %v", err)
+		log.Printf("Failed to read YAML file: %v", err)
+		return
 	}
 
 	var job model.Job
 	err = yaml.Unmarshal(jobFile, &job)
 	if err != nil {
-		log.Fatalf("Failed to unmarshal YAML: %v", err)
+		log.Printf("Failed to unmarshal YAML: %v", err)
+		return
 	}
 
 	log.Printf("Running job %d with id: %s", job.Id, job.Name)

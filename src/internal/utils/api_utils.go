@@ -74,12 +74,19 @@ func IsDirEmpty(dir string) (bool, error) {
 	}
 	defer f.Close()
 
-	// Read the directory contents
-	entries, err := f.Readdir(1) // Read up to 1 entry
+	// Read the directory contents (read up to 1 entry)
+	_, err = f.Readdir(1)
+
+	// If EOF is returned, the directory is empty
+	if err == io.EOF {
+		return true, nil
+	}
+
+	// If another error occurs, return it
 	if err != nil {
 		return false, fmt.Errorf("failed to read directory: %v", err)
 	}
 
-	// If no entries are found, the directory is empty
-	return len(entries) == 0, nil
+	// If no error and no EOF, the directory is not empty
+	return false, nil
 }
