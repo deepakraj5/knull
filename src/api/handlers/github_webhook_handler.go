@@ -8,21 +8,14 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	var headers dtos.GithubWebhookRequestHeaders
 	var body dtos.GithubWebhookRequestBody
 
-	err = utils.ParseRequest(r, &headers, &body)
+	err := utils.ParseRequest(r, &headers, &body)
 	if err != nil {
 		log.Printf("Error parsing request: %v\n", err)
 		http.Error(w, "Error parsing request", http.StatusBadRequest)
