@@ -47,8 +47,6 @@ func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 			gitRepo := strings.ReplaceAll(body.Repository.CloneUrl, "https://", "")
 			gitCloneCmd := "git clone --single-branch -b development https://oauth2:" + os.Getenv("GITHUB_PAT") + "@" + gitRepo + " ."
 
-			log.Println(gitCloneCmd)
-
 			err := necrosword.Shell(gitCloneCmd, repoDir)
 
 			if err != nil {
