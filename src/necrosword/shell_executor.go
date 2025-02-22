@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Shell(command string, dir string) {
+func Shell(command string, dir string) error {
 
 	executableCommand := strings.Fields(command)
 
@@ -17,18 +17,18 @@ func Shell(command string, dir string) {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Printf("Error creating stdout pipe: %v\n", err)
-		return
+		return err
 	}
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		log.Printf("Error creating stderr pipe: %v\n", err)
-		return
+		return err
 	}
 
 	if err := cmd.Start(); err != nil {
 		log.Printf("Error starting command %v\n", err)
-		return
+		return err
 	}
 
 	go func() {
@@ -47,8 +47,10 @@ func Shell(command string, dir string) {
 
 	if err := cmd.Wait(); err != nil {
 		log.Printf("Error waiting for command: %v\n", err)
-		return
+		return err
 	}
 
 	log.Printf("Command Executed successfully %s", command)
+
+	return nil
 }

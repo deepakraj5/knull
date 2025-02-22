@@ -46,12 +46,20 @@ func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 			// clone the given repo
 			gitRepo := strings.ReplaceAll(body.Repository.CloneUrl, "https://", "")
 			gitCloneCmd := "git clone --single-branch -b development https://oauth2:" + os.Getenv("GITHUB_PAT") + "@" + gitRepo + " ."
-			necrosword.Shell(gitCloneCmd, repoDir)
+			err := necrosword.Shell(gitCloneCmd, repoDir)
+
+			if err != nil {
+				return
+			}
 
 			log.Printf("Cloned the repo: %s successfully", body.Repository.Name)
 		} else {
 			// pull the latest changes
-			necrosword.Shell("git pull", repoDir)
+			err := necrosword.Shell("git pull", repoDir)
+
+			if err != nil {
+				return
+			}
 
 			log.Printf("Pulled the latest changes from the repo: %s successfully", body.Repository.Name)
 		}

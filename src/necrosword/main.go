@@ -37,6 +37,10 @@ func Execute(jobFilePath string, dir string) {
 	for _, stages := range job.Stages {
 		log.Printf("Executing stage: %s, with command: %s", stages.Stage.Name, stages.Stage.Cmd)
 
-		Shell(stages.Stage.Cmd, dir)
+		err := Shell(stages.Stage.Cmd, dir)
+
+		if err != nil {
+			return
+		}
 	}
 }
