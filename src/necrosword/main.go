@@ -1,6 +1,8 @@
 package necrosword
 
 import (
+	"knull/infrastructure/services"
+	"knull/internal/dtos"
 	"knull/necrosword/model"
 	"log"
 	"os"
@@ -8,12 +10,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Execute(jobFilePath string, dir string) {
+func Execute(jobFilePath string, dir string, body dtos.GithubWebhookRequestBody, githubPat string) {
 	log.Println("Running job with necrosword")
 
 	jobFile, err := os.ReadFile(jobFilePath)
 	if err != nil {
 		log.Printf("Failed to read YAML file: %v", err)
+		services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 		return
 	}
 
@@ -21,6 +24,7 @@ func Execute(jobFilePath string, dir string) {
 	err = yaml.Unmarshal(jobFile, &job)
 	if err != nil {
 		log.Printf("Failed to unmarshal YAML: %v", err)
+		services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 		return
 	}
 
@@ -40,7 +44,9 @@ func Execute(jobFilePath string, dir string) {
 		err := Shell(stages.Stage.Cmd, dir)
 
 		if err != nil {
+			services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 			return
 		}
 	}
+	services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "success", "https://knull.com", "building", "ci/knull")
 }

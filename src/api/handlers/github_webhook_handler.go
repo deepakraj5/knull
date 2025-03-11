@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"knull/infrastructure/services"
 	"knull/internal/dtos"
 	"knull/internal/utils"
 	"knull/necrosword"
@@ -28,28 +29,35 @@ func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 	if headers.XGitHubEvent == event && body.Ref == branch {
 		log.Printf("New commit has been pushed for branch: %s in repository: %s", body.Ref, body.Repository.Name)
 
+		githubPat := os.Getenv("GITHUB_PAT")
+
+		services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "pending", "https://knull.com", "building", "ci/knull")
+
 		// create a directory in the workspace for the repository
 		repoDir := "../workspace/" + body.Repository.Name
 		err := os.MkdirAll(repoDir, 0755) // 0755 -> The owner can read, write, execute. Everyone else can read and execute but not modify the file.
 		if err != nil {
 			log.Printf("Failed to create directory: %v\n", err)
+			services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 			return
 		}
 
 		isEmptyDir, err := utils.IsDirEmpty(repoDir)
 		if err != nil {
 			log.Printf("Error checking directory: %v\n", err)
+			services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 			return
 		}
 
 		if isEmptyDir {
 			// clone the given repo
 			gitRepo := strings.ReplaceAll(body.Repository.CloneUrl, "https://", "")
-			gitCloneCmd := "git clone --single-branch -b development https://oauth2:" + os.Getenv("GITHUB_PAT") + "@" + gitRepo + " ."
+			gitCloneCmd := "git clone --single-branch -b development https://oauth2:" + githubPat + "@" + gitRepo + " ."
 
 			err := necrosword.Shell(gitCloneCmd, repoDir)
 
 			if err != nil {
+				services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 				return
 			}
 
@@ -59,6 +67,7 @@ func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 			err := necrosword.Shell("git pull", repoDir)
 
 			if err != nil {
+				services.UpdateCommitStatus(githubPat, body.Repository.Owner.Name, body.Repository.Name, body.HeadCommit.Id, "failure", "https://knull.com", "error", "ci/knull")
 				return
 			}
 
@@ -67,7 +76,7 @@ func GitHubWebhook(w http.ResponseWriter, r *http.Request) {
 
 		// execute pipeline file from cloned repo
 		var jobFilePath string = repoDir + "/knull.yaml"
-		necrosword.Execute(jobFilePath, repoDir)
+		necrosword.Execute(jobFilePath, repoDir, body, githubPat)
 	}
 
 	payload := dtos.ResponseDto{
